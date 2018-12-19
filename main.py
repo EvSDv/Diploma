@@ -43,18 +43,28 @@ class User:
             print(text, i, end='')
             sys.stdout.write(text)
             sys.stdout.flush()
-            #try:
+            successful = False
+            while not successful:
+                try:
 
-            resp = requests.get('https://api.vk.com/method/groups.get', params={
-                'v': self.version_api,
-                'user_id': user,
-                'access_token': self.token_netology
-            }).json()
-            if 'response' in resp:
-                communities.extend(resp['response']['items'])
+                    resp = requests.get('https://api.vk.com/method/groups.get', params={
+                        'v': self.version_api,
+                        'user_id': user,
+                        'access_token': self.token_netology
+                    }).json()
+                    communities.extend(resp['response']['items'])
+                    successful = True
 
-            # except KeyError:
-            #     continue
+                except KeyError:
+                    if resp['error']['error_code'] == 7 or resp['error']['error_code'] == 18:
+                        successful = True
+
+                    if resp['error']['error_code'] == 6:
+                        time.sleep(0.3)
+
+
+
+
         print('\r\n')
         return set(communities)
 
